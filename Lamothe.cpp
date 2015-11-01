@@ -56,7 +56,7 @@ void Init_Graphics()
 
 	start_color();
 
-	init_pair(1, 15, 0);
+	init_pair(1, COLOR_RED, COLOR_BLACK);
 
 	// seed the random number generator with time
 	srand((unsigned)time(NULL));
@@ -82,12 +82,8 @@ void Draw_String(int x, int y, char *string)
 	int cursor_pos_x = x;
 	int cursor_pos_y = y;
 
-	// set printing position
-
-//	mvinsch(cursor_pos_x,cursor_pos_y, ' ');
-
-	// print the string in current color
-	mvprintw(cursor_pos_y, cursor_pos_x, string);
+	// print the string in current color and position
+	mvaddstring(cursor_pos_y, cursor_pos_x, string);
 
 } // end Draw_String
 
@@ -134,25 +130,25 @@ int main()
 		// nothing to erase in our case   
 
 		// SECTION: get player input
-/*		if (_kbhit())
+		if (getch())
 		{
 			// get keyboard data, and filter it
-			key = toupper(_getch());
+			key = getch();
 
 			// is player trying to exit, if so exit
-			if (key == 'Q' || key == 27)
+			if (key == 'q' || key == 27)
 				game_running = 0;
 
 			// is player moving left        
-			if (key == 'A')
+			if (key == 'a')
 				player_x--;
 
 			// is player moving right
-			if (key == 'S')
+			if (key == 's')
 				player_x++;
 
 		} // end if   
-*/
+
 		// SECTION: game logic and further processing
 
 		// make sure player stays on screen 
@@ -171,7 +167,7 @@ int main()
 		// draw player 
 //		Set_Color(rand() % 15, 0);
 		Draw_String(player_x, 0, "<--*-->");
-		Draw_String(0, 0, "");
+//		Draw_String(0, 0, "");
 
 		refresh();
 
