@@ -32,7 +32,7 @@
 
 // PROTOTYPES /////////////////////////////////////////////
 
-void Init_Graphics(void);
+void Init_Graphics();
 void Set_Color(int fcolor, int bcolor);
 void Draw_String(int x, int y, char *string);
 
@@ -75,7 +75,7 @@ void Init_Graphics()
 
 ///////////////////////////////////////////////////////////
 
-inline void Draw_String(int x, int y, char *string)
+void Draw_String(int x, int y, char *string)
 {
 	// this function draws a string at the given x,y
 
@@ -93,7 +93,7 @@ inline void Draw_String(int x, int y, char *string)
 
 ///////////////////////////////////////////////////////////
 
-inline void Clear_Screen(void)
+void Clear_Screen(void)
 {
 	// this function clears the screen
 
