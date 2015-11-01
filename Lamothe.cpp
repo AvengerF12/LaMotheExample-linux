@@ -20,7 +20,6 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <ncurses.h>
-#include <curses.h>
 #include <time.h>
 #include <string>
 #include <unistd.h>
@@ -34,8 +33,8 @@
 // PROTOTYPES /////////////////////////////////////////////
 
 void Init_Graphics(void);
-inline void Set_Color(int fcolor, int bcolor);
-inline void Draw_String(int x, int y, char *string);
+void Set_Color(int fcolor, int bcolor);
+void Draw_String(int x, int y, char *string);
 
 // GLOBALS ////////////////////////////////////////////////
 
@@ -43,19 +42,21 @@ int    game_running = 1; // state of game, 0=done, 1=run
 
 // FUNCTIONS //////////////////////////////////////////////
 
-void Init_Graphics(void)
+void Init_Graphics()
 {
 	// this function initializes the console graphics engine
 
 	setlocale(LC_ALL,"uk");
-	
+
 	initscr();
+
+	raw();				/* Line buffering disabled	*/
+	keypad(stdscr, TRUE);		/* We get F1, F2 etc..		*/
+	noecho();			/* Don't echo() while we do getch */
 
 	start_color();
 
 	init_pair(1, 15, 0);
-
-//	WINDOW *;
 
 	// seed the random number generator with time
 	srand((unsigned)time(NULL));
@@ -107,6 +108,7 @@ inline void Clear_Screen(void)
 
 } // end Clear_Screen
 
+
 // MAIN GAME LOOP /////////////////////////////////////////
 using namespace std;
 int main()
@@ -118,9 +120,9 @@ int main()
 
 	// set up the console text graphics system
 	Init_Graphics();
-
+	
 	// clear the screen
-	Clear_Screen();
+//	Clear_Screen();
 
 	// SECTION: main event loop, this is where all the action  
 	// takes place, the general loop is erase-move-draw
@@ -163,11 +165,11 @@ int main()
 		// SECTION: draw everything
 
 		// draw next star at random position
-		Set_Color(15, 0);
+//		Set_Color(15, 0);
 		Draw_String(rand() % 80, SCROLL_POS, ".\n");
 
 		// draw player 
-		Set_Color(rand() % 15, 0);
+//		Set_Color(rand() % 15, 0);
 		Draw_String(player_x, 0, "<--*-->");
 		Draw_String(0, 0, "");
 
@@ -177,9 +179,13 @@ int main()
 	} // end while
 
 	// SECTION: shutdown and bail
-	Clear_Screen();
+//	Clear_Screen();
+
+	refresh();
 
 	printf("\nG A M E  O V E R \n\n");
+
+	endwin();
 
 	return 0;
 } // end main
