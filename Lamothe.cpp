@@ -50,7 +50,7 @@ void Init_Graphics()
 
 	initscr();
 
-	raw();				/* Line buffering disabled	*/
+	cbreak();			/* Line buffering disabled	*/
 	keypad(stdscr, TRUE);		/* We get F1, F2 etc..		*/
 	noecho();			/* Don't echo() while we do getch */
 
@@ -65,7 +65,7 @@ void Init_Graphics()
 
 ///////////////////////////////////////////////////////////
 
-//inline void Set_Color(int fcolor, int bcolor = 0)
+//void Set_Color(int fcolor, int bcolor = 0)
 //{
 	// this function sets the color of the console output
 //	SetConsoleTextAttribute(hconsole, (WORD)((bcolor << 4) |
@@ -84,10 +84,10 @@ void Draw_String(int x, int y, char *string)
 
 	// set printing position
 
-	mvinsch(cursor_pos_x,cursor_pos_y, ' ');
+//	mvinsch(cursor_pos_x,cursor_pos_y, ' ');
 
 	// print the string in current color
-	printf("%s", string);
+	mvprintw(cursor_pos_y, cursor_pos_x, string);
 
 } // end Draw_String
 
@@ -166,12 +166,14 @@ int main()
 
 		// draw next star at random position
 //		Set_Color(15, 0);
-		Draw_String(rand() % 80, SCROLL_POS, ".\n");
+		Draw_String(rand() % MAX_X, SCROLL_POS, ".\n");
 
 		// draw player 
 //		Set_Color(rand() % 15, 0);
 		Draw_String(player_x, 0, "<--*-->");
 		Draw_String(0, 0, "");
+
+		refresh();
 
 		// SECTION: synchronize to a constant frame rate
 		usleep(100);
