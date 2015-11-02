@@ -13,12 +13,13 @@
 // INCLUDES ///////////////////////////////////////////////
 
 #include <iostream>
+#include <string>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
 #include <ncurses.h>
 #include <time.h>
-#include <string>
 #include <unistd.h>
 #include <termios.h>
 #include <fcntl.h>
@@ -59,8 +60,6 @@ void Init_Graphics()
 
 	start_color();
 
-	init_pair(1, COLOR_BLACK, COLOR_WHITE);
-
 	// seed the random number generator with time
 	srand((unsigned)time(NULL));
 
@@ -68,15 +67,25 @@ void Init_Graphics()
 
 ///////////////////////////////////////////////////////////
 
-//void Set_Color(int fcolor, int bcolor = 0)
-//{
-//	init_pair(1, COLOR_RED, COLOR_BLACK);
-//	refresh();
-//} // Set_Color
+void Set_Color(int pairNumber, int foreground, bool isActive, int background=COLOR_BLACK)
+{
+	// Keep an init_pair for every different string in order to not apply the same color to 
+	// everyone of them
+
+	init_pair(pairNumber, foreground, background);
+
+	if(isActive){
+		attron(COLOR_PAIR(pairNumber));
+	} else {
+		attroff(COLOR_PAIR(pairNumber));
+	}
+	
+
+} // Set_Color
 
 ///////////////////////////////////////////////////////////
 
-void Draw_String(int x, int y, char *string)
+void Draw_String(int x, int y, char* string)
 {
 	// this function draws a string at the given x,y
 
@@ -142,6 +151,7 @@ int kbhit()
 
 int msleep(unsigned long milisec)
 {
+//Credits to http://cc.byexamples.com/2007/05/25/nanosleep-is-better-than-sleep-and-usleep/
     struct timespec req={0};
     time_t sec=(int)(milisec/1000);
     milisec=milisec-(sec*1000);
@@ -158,6 +168,7 @@ int main()
 {
 	char key;            // player input data
 	int  player_x = 40;  // player's x 
+	int random_color = 0;
 
 	// SECTION: initialization
 
@@ -208,15 +219,21 @@ int main()
 		// SECTION: draw everything
 
 		// draw next star at random position
-//		Set_Color(15, 0);
+		Set_Color(1, COLOR_WHITE,true);
 		Draw_String(rand() % MAX_X, SCROLL_POS, ".\n");
+		Set_Color(1, COLOR_WHITE,false);
 
 		// Scroll
 		scroll(stdscr);
 
 		// draw player 
-//		Set_Color(rand() % 15, 0);
+
+		random_color = (rand() % 7) + 1;
+
+		Set_Color(2, random_color, true);
 		Draw_String(player_x, 0, "<--*-->");
+		Set_Color(2, random_color, false);
+
 		Draw_String(0, 0, "");
 
 		// SECTION: synchronize to a constant frame rate
