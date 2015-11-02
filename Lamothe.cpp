@@ -140,6 +140,17 @@ int kbhit()
   return 0;
 }
 
+int msleep(unsigned long milisec)
+{
+    struct timespec req={0};
+    time_t sec=(int)(milisec/1000);
+    milisec=milisec-(sec*1000);
+    req.tv_sec=sec;
+    req.tv_nsec=milisec*1000000L;
+    while(nanosleep(&req,&req)==-1)
+         continue;
+    return 1;
+}
 
 // MAIN GAME LOOP /////////////////////////////////////////
 using namespace std;
@@ -209,7 +220,7 @@ int main()
 		Draw_String(0, 0, "");
 
 		// SECTION: synchronize to a constant frame rate
-		usleep(1);
+		msleep(45);
 
 	} // end while
 
