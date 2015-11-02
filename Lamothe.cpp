@@ -1,14 +1,10 @@
 
 //  A game fragment adapted from Andre La Mothe's book
-//  Ported by Antonello Dettori
+//  Ported to GNU/Linux by Antonello Dettori
 
 //	The Black Art of 3D Games Programming
 
 //  Modified by CJM 24/9/'08 to run without error or warnings:
-
-//	1.  hconsole - called TEXT( ) for parameter 1
-//	2.  added _ as prefix to deprecated kbhit() function
-//	3.  added _ as prefix to deprecated getch() function
 
 //	Note: this is very old-fashioned code originally written for 16-bit PCs
 
@@ -140,8 +136,8 @@ int main()
 		if(key = getch()){
 		
 		// is player trying to exit, if so exit
-//		if (key == KEY_ESC || key == 27)
-//			game_running = 0;
+		if (key == 27)
+			game_running = 0;
 
 		// is player moving left        
 		if (key == KEY_LEFT)
