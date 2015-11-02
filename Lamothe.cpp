@@ -54,9 +54,13 @@ void Init_Graphics()
 	keypad(stdscr, TRUE);		/* We get F1, F2 etc..		*/
 	noecho();			/* Don't echo() while we do getch */
 
+	scrollok(stdscr, TRUE);
+
+	curs_set(0);			/*Set cursor invisible*/
+
 	start_color();
 
-	init_pair(1, COLOR_RED, COLOR_BLACK);
+	init_pair(1, COLOR_BLACK, COLOR_WHITE);
 
 	// seed the random number generator with time
 	srand((unsigned)time(NULL));
@@ -67,10 +71,8 @@ void Init_Graphics()
 
 //void Set_Color(int fcolor, int bcolor = 0)
 //{
-	// this function sets the color of the console output
-//	SetConsoleTextAttribute(hconsole, (WORD)((bcolor << 4) |
-//		fcolor));
-//
+//	init_pair(1, COLOR_RED, COLOR_BLACK);
+//	refresh();
 //} // Set_Color
 
 ///////////////////////////////////////////////////////////
@@ -83,7 +85,9 @@ void Draw_String(int x, int y, char *string)
 	int cursor_pos_y = y;
 
 	// print the string in current color and position
-	mvaddstring(cursor_pos_y, cursor_pos_x, string);
+	mvaddstr(cursor_pos_y, cursor_pos_x, string);
+
+	refresh();
 
 } // end Draw_String
 
@@ -102,6 +106,8 @@ void Clear_Screen(void)
 	for (int index = 0; index <= SCROLL_POS; index++)
 		Draw_String(0, SCROLL_POS, "\n");
 
+	refresh();
+
 } // end Clear_Screen
 
 
@@ -109,7 +115,7 @@ void Clear_Screen(void)
 using namespace std;
 int main()
 {
-	char key;            // player input data
+	int key;            // player input data
 	int  player_x = 40;  // player's x 
 
 	// SECTION: initialization
@@ -118,7 +124,7 @@ int main()
 	Init_Graphics();
 	
 	// clear the screen
-//	Clear_Screen();
+	Clear_Screen();
 
 	// SECTION: main event loop, this is where all the action  
 	// takes place, the general loop is erase-move-draw
@@ -130,25 +136,23 @@ int main()
 		// nothing to erase in our case   
 
 		// SECTION: get player input
-		if (getch())
-		{
-			// get keyboard data, and filter it
-			key = getch();
+		
+		if(key = getch()){
+		
+		// is player trying to exit, if so exit
+//		if (key == KEY_ESC || key == 27)
+//			game_running = 0;
 
-			// is player trying to exit, if so exit
-			if (key == 'q' || key == 27)
-				game_running = 0;
+		// is player moving left        
+		if (key == KEY_LEFT)
+			player_x--;
 
-			// is player moving left        
-			if (key == 'a')
-				player_x--;
+		// is player moving right
+		if (key == KEY_RIGHT)
+			player_x++;
 
-			// is player moving right
-			if (key == 's')
-				player_x++;
-
-		} // end if   
-
+//		ch = 0; 
+}
 		// SECTION: game logic and further processing
 
 		// make sure player stays on screen 
@@ -164,12 +168,13 @@ int main()
 //		Set_Color(15, 0);
 		Draw_String(rand() % MAX_X, SCROLL_POS, ".\n");
 
+		// Scroll
+		scroll(stdscr);
+
 		// draw player 
 //		Set_Color(rand() % 15, 0);
 		Draw_String(player_x, 0, "<--*-->");
-//		Draw_String(0, 0, "");
-
-		refresh();
+		Draw_String(0, 0, "");
 
 		// SECTION: synchronize to a constant frame rate
 		usleep(100);
@@ -177,13 +182,12 @@ int main()
 	} // end while
 
 	// SECTION: shutdown and bail
-//	Clear_Screen();
+	Clear_Screen();
 
-	refresh();
-
-	printf("\nG A M E  O V E R \n\n");
+	Draw_String(MAX_X/2,SCROLL_POS/2, "G A M E  O V E R");
 
 	endwin();
 
 	return 0;
+
 } // end main
