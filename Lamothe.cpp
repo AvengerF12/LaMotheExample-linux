@@ -106,9 +106,7 @@ void Clear_Screen(void)
 	// this function clears the screen
 
 	// set color to white on black
-//	Set_Color(15, 0);
-
-//	color_set(COLOR_PAIR(1));
+	Set_Color(1, COLOR_WHITE, true);
 
 	// clear the screen
 	for (int x = 0; x <= MAX_X; x++){
@@ -117,6 +115,8 @@ void Clear_Screen(void)
 		}
 	}
 
+	Set_Color(1, COLOR_WHITE, false);
+
 	refresh();
 
 } // end Clear_Screen
@@ -124,29 +124,29 @@ void Clear_Screen(void)
 
 int kbhit()
 {
-  struct termios oldt, newt;
-  int ch;
-  int oldf;
+	struct termios oldt, newt;
+	int ch;
+	int oldf;
  
-  tcgetattr(STDIN_FILENO, &oldt);
-  newt = oldt;
-  newt.c_lflag &= ~(ICANON | ECHO);
-  tcsetattr(STDIN_FILENO, TCSANOW, &newt);
-  oldf = fcntl(STDIN_FILENO, F_GETFL, 0);
-  fcntl(STDIN_FILENO, F_SETFL, oldf | O_NONBLOCK);
+	tcgetattr(STDIN_FILENO, &oldt);
+	newt = oldt;
+	newt.c_lflag &= ~(ICANON | ECHO);
+	tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+	oldf = fcntl(STDIN_FILENO, F_GETFL, 0);
+	fcntl(STDIN_FILENO, F_SETFL, oldf | O_NONBLOCK);
+
+	ch = getchar();
+
+	tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+	fcntl(STDIN_FILENO, F_SETFL, oldf);
  
-  ch = getchar();
+	if(ch != EOF)
+	{
+		ungetc(ch, stdin);
+		return 1;
+	}
  
-  tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
-  fcntl(STDIN_FILENO, F_SETFL, oldf);
- 
-  if(ch != EOF)
-  {
-    ungetc(ch, stdin);
-    return 1;
-  }
- 
-  return 0;
+	return 0;
 }
 
 int msleep(unsigned long milisec)
