@@ -12,6 +12,7 @@
 
 // INCLUDES ///////////////////////////////////////////////
 
+#include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -19,6 +20,8 @@
 #include <time.h>
 #include <string>
 #include <unistd.h>
+#include <termios.h>
+#include <fcntl.h>
 
 
 // DEFINES ////////////////////////////////////////////////
@@ -99,19 +102,50 @@ void Clear_Screen(void)
 //	color_set(COLOR_PAIR(1));
 
 	// clear the screen
-	for (int index = 0; index <= SCROLL_POS; index++)
-		Draw_String(0, SCROLL_POS, "\n");
+	for (int x = 0; x <= MAX_X; x++){
+		for (int y = 0; y <= SCROLL_POS; y++){
+			Draw_String(x, y, "\n");
+		}
+	}
 
 	refresh();
 
 } // end Clear_Screen
 
 
+int kbhit()
+{
+  struct termios oldt, newt;
+  int ch;
+  int oldf;
+ 
+  tcgetattr(STDIN_FILENO, &oldt);
+  newt = oldt;
+  newt.c_lflag &= ~(ICANON | ECHO);
+  tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+  oldf = fcntl(STDIN_FILENO, F_GETFL, 0);
+  fcntl(STDIN_FILENO, F_SETFL, oldf | O_NONBLOCK);
+ 
+  ch = getchar();
+ 
+  tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+  fcntl(STDIN_FILENO, F_SETFL, oldf);
+ 
+  if(ch != EOF)
+  {
+    ungetc(ch, stdin);
+    return 1;
+  }
+ 
+  return 0;
+}
+
+
 // MAIN GAME LOOP /////////////////////////////////////////
 using namespace std;
 int main()
 {
-	int key;            // player input data
+	char key;            // player input data
 	int  player_x = 40;  // player's x 
 
 	// SECTION: initialization
@@ -133,22 +167,24 @@ int main()
 
 		// SECTION: get player input
 		
-		if(key = getch()){
+		if(kbhit()){
 		
-		// is player trying to exit, if so exit
-		if (key == 27)
-			game_running = 0;
+			key = getchar();
 
-		// is player moving left        
-		if (key == KEY_LEFT)
-			player_x--;
+			// is player trying to exit, if so exit
+			if (key == 27)
+				game_running = 0;
 
-		// is player moving right
-		if (key == KEY_RIGHT)
-			player_x++;
+			// is player moving left        
+			if (key == 'a')
+				player_x--;
 
-//		ch = 0; 
-}
+			// is player moving right
+			if (key == 'd')
+				player_x++;
+
+		}
+
 		// SECTION: game logic and further processing
 
 		// make sure player stays on screen 
@@ -173,7 +209,7 @@ int main()
 		Draw_String(0, 0, "");
 
 		// SECTION: synchronize to a constant frame rate
-		usleep(100);
+		usleep(1);
 
 	} // end while
 
@@ -181,6 +217,8 @@ int main()
 	Clear_Screen();
 
 	Draw_String(MAX_X/2,SCROLL_POS/2, "G A M E  O V E R");
+
+	getch();
 
 	endwin();
 
